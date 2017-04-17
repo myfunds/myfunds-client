@@ -1,0 +1,23 @@
+.page {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+}
+.layout-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.layout-enter.layout-enter-active {
+  opacity: 1;
+}
+
+.layout-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.layout-leave.layout-leave-active {
+  opacity: 0;
+}

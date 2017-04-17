@@ -1,0 +1,9 @@
+@import '~bootstrap/scss/bootstrap.scss';
+$fa-font-path: "~font-awesome/fonts";
+@import '~font-awesome/scss/font-awesome';
+@import './ui/components/styles/animate.scss';
+@import './ui/components/react-calendar/calendar.scss';
+@import './ui/components/card-drawer/card-drawer.scss';
+@import './ui/layouts/layout.scss';
+@import './ui/components/loader/loader.scss';
+@import './ui/components/add-transaction/rotateIcon.scss';

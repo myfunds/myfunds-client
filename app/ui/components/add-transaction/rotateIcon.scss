@@ -1,0 +1,67 @@
+.rotate {
+  /*border: 1px solid black;
+  height: 100px;
+  width: 100px;*/
+}
+
+.over {
+  transform:          rotate( 45deg );
+  -moz-transform:     rotate( 45deg );
+  -ms-transform:      rotate( 45deg );
+  -o-transform:       rotate( 45deg );
+  -webkit-transform:  rotate( 45deg );
+  transition:         transform 750ms ease;
+  -moz-transition:    -moz-transform 750ms ease;
+  -ms-transition:     -ms-transform 750ms ease;
+  -o-transition:      -o-transform 750ms ease;
+  -webkit-transition: -webkit-transform 750ms ease;
+}
+
+.out {
+  transform:          rotate( 0deg );
+  -moz-transform:     rotate( 0deg );
+  -ms-transform:      rotate( 0deg );
+  -o-transform:       rotate( 0deg );
+  -webkit-transform:  rotate( 0deg );
+  transition:         transform 750ms ease;
+  -moz-transition:    -moz-transform 750ms ease;
+  -ms-transition:     -ms-transform 750ms ease;
+  -o-transition:      -o-transform 750ms ease;
+  -webkit-transition: -webkit-transform 750ms ease;
+}
+
+.formContainer{
+  height: 220px;
+}
+.grow {
+  height: 220px;
+  transition:         height 750ms ease;
+  -moz-transition:    height 750ms ease;
+  -ms-transition:     height 750ms ease;
+  -o-transition:      height 750ms ease;
+  -webkit-transition: height 750ms ease;
+}
+
+.growInDrawer{
+  height: 220px;
+  position: absolute;
+  background: aliceblue;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 9001;
+  transition:         height 750ms ease;
+  -moz-transition:    height 750ms ease;
+  -ms-transition:     height 750ms ease;
+  -o-transition:      height 750ms ease;
+  -webkit-transition: height 750ms ease;
+}
+
+.shrink {
+  height: 0px;
+  transition:         height 750ms ease;
+  -moz-transition:    height 750ms ease;
+  -ms-transition:     height 750ms ease;
+  -o-transition:      height 750ms ease;
+  -webkit-transition: height 750ms ease;
+}

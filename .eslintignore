@@ -1,0 +1,9 @@
+node_modules/**
+**/*.css
+**/*.html
+**/*.story.js
+**/story.js
+build/**
+server.js
+server.bundle.js
+webpack.server.config.js
