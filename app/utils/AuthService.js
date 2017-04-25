@@ -2,8 +2,7 @@
 import { EventEmitter } from 'events';
 import Auth0Lock from 'auth0-lock';
 import config from 'config';
-// import { history } from 'react-router-dom';
-import createHistory from 'history/createBrowserHistory';
+import createHistory from 'history/createBrowserHistory'; // TODO: does this work?
 import { isTokenExpired } from './jwtHelper';
 
 const history = createHistory();

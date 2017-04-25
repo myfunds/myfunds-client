@@ -7,13 +7,12 @@ class LoginAuth0 extends Component {
 
 
   static propTypes = {
-    // clientId: PropTypes.string.isRequired,
-    // domain: PropTypes.string.isRequired,
     history: PropTypes.object.isRequired,
   }
 
   constructor(props) {
     super(props);
+    // TODO: maybe make these props that get passed in from higher up in the app
     this._lock = new Auth0Lock(config.clientId, config.domain);
   }
 

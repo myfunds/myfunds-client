@@ -1,7 +1,6 @@
 /* eslint no-param-reassign: 0 */
 import React, { PropTypes } from 'react';
 import { render } from 'react-dom';
-// import { Router, Route, browserHistory, IndexRoute } from 'react-router';
 import {
   BrowserRouter as Router,
   Route,
