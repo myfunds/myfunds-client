@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import { Link } from 'react-router';
+import { Link, withRouter } from 'react-router-dom';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -13,51 +13,51 @@ class App extends Component {
   }
 
   componentWillMount() {
-    if (this.props.route.auth.loggedIn() && !this.props.user.id && this.context.router[0] !== '/profile') this.context.router.push('/profile');
+    // if (this.props.auth.loggedIn() && !this.props.user.id && this.props.history[0] !== '/profile') this.props.history.push('/profile');
   }
 
   signOut(event) {
     event.preventDefault();
     // destroys the session data
-    this.props.route.auth.logout();
+    this.props.auth.logout();
     // TODO: clear the data from apollo
     // redirects to login page
-    this.context.router.push('/');
+    this.props.history.push('/');
   }
 
   renderHeader() {
     // TODO: move to prop
-    const isLoggedIn = this.props.route.auth.loggedIn();
+    const isLoggedIn = this.props.auth.loggedIn();
     return (
       <nav
         className="navbar navbar-fixed-top navbar-light bg-faded"
         style={{ marginBottom: '10px' }}
       >
         <div id="exCollapsingNavbar2">
-          <Link to="/" className="navbar-brand" activeClassName="active" style={{ width: '30px' }}>
+          <Link to="/" className="navbar-brand" style={{ width: '30px' }}>
             <i className="fa fa-home fa-lg" aria-hidden="true" />
           </Link>
           {isLoggedIn ? (
             <ul className="nav navbar-nav">
               <li className={`nav-item ${this.props.title === 'Dashboard' ? 'active' : ''}`}>
-                <Link to={'/dashboard'} className="nav-link" activeClassName="active">
+                <Link to={'/dashboard'} className="nav-link">
                   <i className="fa fa-tachometer fa-lg" aria-hidden="true" />
                 </Link>
               </li>
               <li
                 className={`nav-item ${this.props.title === 'Financial Accounts' ? 'active' : ''}`}
               >
-                <Link to={'/accounts'} className="nav-link" activeClassName="active">
+                <Link to={'/accounts'} className="nav-link">
                   <i className="fa fa-university fa-lg" aria-hidden="true" />
                 </Link>
               </li>
               <li className={`nav-item ${this.props.title === 'Budgets' ? 'active' : ''}`}>
-                <Link to={'/categories'} className="nav-link" activeClassName="active">
+                <Link to={'/categories'} className="nav-link">
                   <i className="fa fa-list fa-lg" aria-hidden="true" />
                 </Link>
               </li>
               <li className={`nav-item ${this.props.title === 'Profile' ? 'active' : ''}`}>
-                <Link to={'/profile'} className="nav-link" activeClassName="active">
+                <Link to={'/profile'} className="nav-link">
                   <i className="fa fa-user fa-lg" aria-hidden="true" />
                 </Link>
               </li>
@@ -75,7 +75,7 @@ class App extends Component {
                 id="sign-in"
                 className={`nav-item ${this.props.title === 'Sign In' ? 'active' : ''}`}
               >
-                <Link to="/sign-in" className="nav-link" activeClassName="active">
+                <Link to="/sign-in" className="nav-link">
                   <i className="fa fa-sign-in fa-lg" aria-hidden="true" />
                 </Link>
               </li>
@@ -106,8 +106,8 @@ class App extends Component {
             transitionLeaveTimeout={1000}
           >
             {React.cloneElement(this.props.children, {
-              key: this.props.location.pathname,
-              auth: this.props.route.auth,
+              // key: this.props.location.pathname,
+              auth: this.props.auth,
             })}
           </ReactCSSTransitionGroup>
         </div>
@@ -117,10 +117,11 @@ class App extends Component {
 }
 
 App.propTypes = {
-  children: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.array.isRequired,
+    PropTypes.object.isRequired,
+  ]),
   title: PropTypes.string.isRequired,
-  route: PropTypes.object.isRequired,
   auth: PropTypes.instanceOf(AuthService).isRequired,
   user: PropTypes.object.isRequired,
 };
@@ -139,12 +140,12 @@ const userQuery = gql`
   }
 `;
 
-export default graphql(userQuery, {
+export default withRouter(graphql(userQuery, {
   options(props) {
     return {
       forceFetch: true,
       variables: {
-        auth0UserId: props.route.auth.getProfile().user_id,
+        auth0UserId: props.auth.getProfile().user_id,
       },
     };
   },
@@ -154,4 +155,4 @@ export default graphql(userQuery, {
     user: getUser || {},
     refetch,
   })
-})(App);
+})(App));

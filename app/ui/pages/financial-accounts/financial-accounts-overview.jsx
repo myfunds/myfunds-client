@@ -115,7 +115,7 @@ const FinancialAccountOverviewWithData = graphql(qFinancialAccountOverview, {
   options(props) {
     return {
       variables: {
-        financialAccountId: props.params.financialAccountId,
+        financialAccountId: props.match.params.financialAccountId,
       },
     };
   },
@@ -134,7 +134,7 @@ const FinancialAccountOverviewWithData = graphql(qFinancialAccountOverview, {
     ownProps,
     isLoading: loading,
     financialAccount: prepareFiancialAccount(FinancialAccount) || {},
-    financialAccountId: ownProps.params.financialAccountId,
+    financialAccountId: ownProps.match.params.financialAccountId,
     refetch,
   }),
 })(FinancialAccountOverview);

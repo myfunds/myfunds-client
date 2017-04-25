@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
+import { withRouter } from 'react-router-dom';
 import EditTransaction from '../edit-transaction/edit-transaction.jsx';
 
 import './card-drawer.scss';
 
-export default class CardAndDraw extends Component {
+class CardAndDraw extends Component {
   constructor(props, context) {
     super(props, context);
 
@@ -45,7 +46,7 @@ export default class CardAndDraw extends Component {
 
   goToFinanceAccount(event) {
     if (!this.props.urlHandle || event.target.className.includes('drawer-handle-js')) return;
-    this.context.router.push(this.props.urlHandle);
+    this.props.history.push(this.props.urlHandle);
   }
   render() {
     return (
@@ -160,6 +161,7 @@ CardAndDraw.propTypes = {
   refetch: PropTypes.func.isRequired,
   financialAccounts: PropTypes.array,
   categories: PropTypes.array,
+  history: PropTypes.object.isRequired,
 };
 
 CardAndDraw.defaultProps = {
@@ -175,3 +177,5 @@ CardAndDraw.defaultProps = {
 CardAndDraw.contextTypes = {
   router: React.PropTypes.object.isRequired,
 };
+
+export default withRouter(CardAndDraw);
