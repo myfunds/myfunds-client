@@ -1,26 +1,25 @@
 import React, { Component, PropTypes } from 'react';
 import config from 'config';
 import Auth0Lock from 'auth0-lock';
-import AuthService from '../../../utils/AuthService.js';
+import { withRouter } from 'react-router-dom';
 
 class LoginAuth0 extends Component {
 
 
   static propTypes = {
-    clientId: PropTypes.string.isRequired,
-    domain: PropTypes.string.isRequired,
-    router: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   }
 
   constructor(props) {
     super(props);
-    this._lock = new Auth0Lock(props.clientId, props.domain);
+    // TODO: maybe make these props that get passed in from higher up in the app
+    this._lock = new Auth0Lock(config.clientId, config.domain);
   }
 
   componentDidMount() {
     this._lock.on('authenticated', (authResult) => {
       window.localStorage.setItem('auth0IdToken', authResult.idToken);
-      this.props.router.replace('/profile');
+      this.props.history.replace('/profile');
 
       this._lock.getProfile(authResult.idToken, (error, profile) => {
         if (error) {
@@ -64,23 +63,22 @@ class LoginAuth0 extends Component {
   }
 }
 
-const SignIn = (props, context) => (
+const SignIn = (props) => (
   <div className="page">
     <div className="container">
       <LoginAuth0
         clientId={config.clientId}
-        domain={config.domain}
-        router={context.router}
+        history={props.history}
       />
     </div>
   </div>
 );
 
-export default SignIn;
+export default withRouter(SignIn);
 
 
 SignIn.propTypes = {
-  auth: PropTypes.instanceOf(AuthService).isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 SignIn.contextTypes = {

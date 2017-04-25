@@ -1,11 +1,16 @@
 /* eslint no-param-reassign: 0 */
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { render } from 'react-dom';
-import { Router, Route, browserHistory, IndexRoute } from 'react-router';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from 'react-router-dom';
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 
 import { ApolloProvider } from 'react-apollo';
-import ReactGA from 'react-ga';
+// import ReactGA from 'react-ga';
 
 // webpack alias
 import config from 'config';
@@ -21,15 +26,6 @@ import Dashboard from './ui/pages/dashboard/dashboard.jsx';
 import './main.scss';
 
 const auth = new AuthService(config.clientId, config.domain);
-
-function requireAuth(nextState, replace) {
-  if (!auth.loggedIn()) {
-    replace({
-      pathname: '/',
-      state: { nextPathname: nextState.location.pathname },
-    });
-  }
-}
 
 const networkInterface = createNetworkInterface({ uri: config.graphqlUrl });
 
@@ -50,27 +46,51 @@ networkInterface.use([{
 
 const client = new ApolloClient({ networkInterface });
 
-function logPageView() {
-  ReactGA.set({ page: window.location.pathname });
-  ReactGA.pageview(window.location.pathname);
-}
+// function logPageView() {
+//   ReactGA.set({ page: window.location.pathname });
+//   ReactGA.pageview(window.location.pathname);
+// }
 
-const routes = (
-  <Route path="/" component={App} auth={auth}>
-    <IndexRoute component={SignIn} />
-    <Route path="/dashboard" component={Dashboard} onEnter={requireAuth} />
-    <Route path="/profile" component={ProfileWithData} onEnter={requireAuth} />
-    <Route path="/accounts" component={FinancialAccountSection} onEnter={requireAuth} />
-    <Route path="/accounts/:financialAccountId" component={FinancialAccountOverview} onEnter={requireAuth} />
-    <Route path="/categories" component={CategoriesForBudget} onEnter={requireAuth} />
-  </Route>
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest} render={props => (
+    auth.loggedIn() ? (
+      <Component auth={auth} {...props} />
+    ) : (
+      <Redirect
+        to={{
+          pathname: '/',
+          state: { from: props.location }
+        }}
+      />
+    ))}
+  />
 );
+
+PrivateRoute.propTypes = {
+  component: PropTypes.object.isRequired,
+  rest: PropTypes.object.isRequired,
+  location: PropTypes.string.isRequired,
+};
 
 if (typeof document !== 'undefined' && typeof client !== 'undefined') {
   // ReactGA.initialize('UA-87715799-1');
+
   render((
     <ApolloProvider client={client}>
-      <Router routes={routes} history={browserHistory} onUpdate={logPageView} />
+      <Router>
+        <App auth={auth} title="My Funds">
+          <Switch>
+            <Route exact path="/" component={SignIn} auth={auth} />
+            <PrivateRoute path="/dashboard" component={Dashboard} />
+            <PrivateRoute path="/profile" component={ProfileWithData} />
+            <PrivateRoute path="/accounts/:financialAccountId" component={FinancialAccountOverview} />
+            <PrivateRoute path="/accounts" component={FinancialAccountSection} />
+            <PrivateRoute path="/categories" component={CategoriesForBudget} />
+          </Switch>
+        </App>
+      </Router>
     </ApolloProvider>
   ), document.getElementById('app'));
 }
