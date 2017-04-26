@@ -13,7 +13,8 @@ class App extends Component {
   }
 
   componentWillMount() {
-    // if (this.props.auth.loggedIn() && !this.props.user.id && this.props.history[0] !== '/profile') this.props.history.push('/profile');
+    // if (this.props.auth.loggedIn() && !this.props.user.id &&
+    // this.props.history[0] !== '/profile') this.props.history.push('/profile');
   }
 
   signOut(event) {
@@ -108,6 +109,7 @@ class App extends Component {
             {React.cloneElement(this.props.children, {
               // key: this.props.location.pathname,
               auth: this.props.auth,
+              user: this.props.user
             })}
           </ReactCSSTransitionGroup>
         </div>
@@ -120,10 +122,11 @@ App.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.array.isRequired,
     PropTypes.object.isRequired,
-  ]),
+  ]).isRequired,
   title: PropTypes.string.isRequired,
   auth: PropTypes.instanceOf(AuthService).isRequired,
   user: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 App.contextTypes = {
