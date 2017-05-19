@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
 

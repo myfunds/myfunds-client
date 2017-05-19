@@ -1,52 +1,39 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import TransactionsByParent from '../transactions/transactions-section.jsx';
-import CardAndDraw from '../../components/card-drawer/card-drawer.jsx';
+import Tile from '../../components/Tile';
 import Loader from '../../components/loader/loader.jsx';
 
 class FinancialAccountOverview extends Component {
   renderCardAndDrawer() {
-    const params = {
-      title: this.props.financialAccount.name,
-      titleIcon: this.props.financialAccount.type,
-      subtitle: this.props.financialAccount.type,
-      subtitleIcon: 'money',
-      focusText: this.props.financialAccount.currentBalance.toFixed(2),
-      focusTextIcon: 'usd',
-      collectionType: 'FinancialAccounts',
-      doc: this.props.financialAccount,
-      urlHandle: `/accounts/${this.props.financialAccount._id}`,
-    };
-    return <CardAndDraw key={this.props.financialAccount._id} {...params} />;
+    return (
+      <Tile>
+        <h2>{this.props.financialAccount.name}</h2>
+        <h4>{this.props.financialAccount.currentBalance.toFixed(2)}</h4>
+      </Tile>
+    );
   }
 
   render() {
-    return (
-      <div className="page">
-        <div className="container">
-          {
-            this.props.isLoading || !this.props.financialAccount.id ? (<Loader />) : (
-              <div>
-                {this.renderCardAndDrawer()}
-                <TransactionsByParent
-                  refetch={this.props.refetch}
-                  transactions={
-                    this.props.financialAccount
-                      .positiveTransactions
-                      .concat(this.props.financialAccount.negativeTransactions)}
-                />
-              </div>
-            )
-          }
-        </div>
+    return this.props.isLoading || !this.props.financialAccount.id ? (<Loader />) : (
+      <div>
+        {this.renderCardAndDrawer()}
+        <TransactionsByParent
+          refetch={this.props.refetch}
+          transactions={
+            this.props.financialAccount
+            .positiveTransactions
+            .concat(this.props.financialAccount.negativeTransactions)}
+        />
       </div>
     );
   }
 }
 
 FinancialAccountOverview.propTypes = {
-  financialAccount: React.PropTypes.object.isRequired,
+  financialAccount: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   refetch: PropTypes.func.isRequired,
 };

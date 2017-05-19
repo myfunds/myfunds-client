@@ -1,11 +1,15 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
+import glamorous from 'glamorous';
 import gql from 'graphql-tag';
 import Loader from '../../components/loader/loader.jsx';
 import UpdateProfileCategoryMax from '../../components/edit-category-max/edit-category-max.jsx';
 import ProfileDetailsData from './ProfileDetails.jsx';
 import AuthService from '../../../utils/AuthService.js';
+import Tile from '../../components/Tile';
 
+const ProfilePage = glamorous.div({});
 
 export class UserProfile extends Component {
   constructor(props, context) {
@@ -113,21 +117,18 @@ export class UserProfile extends Component {
   }
   render() {
     return this.props.isLoading ? <Loader /> : (
-      <div className="page">
-        <div className="container UserProfile">
-          <div>
-            <h1 id="profile-header">Profile</h1>
-          </div>
-          <ProfileDetailsData profile={this.state.profile} />
-          {!this.state.isNew ? null :
-          <div>
-            <input ref={name => { this.name = name; }} type="text" defaultValue={this.state.profile.given_name} />
-            <br />
-            <input ref={emailAddress => { this.emailAddress = emailAddress; }} type="text" />
-            <br />
-            <button type="button" onClick={this.setUpProfile}> Click me to verify this is you </button>
-          </div>
-          }
+      <ProfilePage>
+        <ProfileDetailsData profile={this.state.profile} />
+        {!this.state.isNew ? null :
+        <div>
+          <input ref={name => { this.name = name; }} type="text" defaultValue={this.state.profile.given_name} />
+          <br />
+          <input ref={emailAddress => { this.emailAddress = emailAddress; }} type="text" />
+          <br />
+          <button type="button" onClick={this.setUpProfile}> Click me to verify this is you </button>
+        </div>
+        }
+        <Tile>
           <div>
             <h2 id="profile-header">Budget Categories</h2>
           </div>
@@ -135,8 +136,8 @@ export class UserProfile extends Component {
             {this.state.hasCategories ? null : <button type="button" onClick={this.addDefaultCategories}>Add all the default categories</button>}
             {this.state.isNew ? null : this.renderCategories()}
           </div>
-        </div>
-      </div>
+        </Tile>
+      </ProfilePage>
     );
   }
 }

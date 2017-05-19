@@ -1,13 +1,34 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
 
 import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
-import CardAndDraw from '../../components/card-drawer/card-drawer.jsx';
+import Tile from '../../components/Tile';
+import Select from '../../components/Select';
 import Loader from '../../components/loader/loader.jsx';
 
 class CategoriesSection extends Component {
+  constructor(props) {
+    super(props);
+
+    this.renderOptions = this.renderOptions.bind(this);
+    this.renderCategory = this.renderCategory.bind(this);
+    this.setCategoryId = this.setCategoryId.bind(this);
+
+    this.state = {
+      categoryId: props.categories && props.categories[0] && props.categories[0].id
+    };
+  }
+  componentWillReceiveProps(nextProps) {
+    this.setState(() => ({
+      categoryId: nextProps.categories && nextProps.categories[0] && nextProps.categories[0].id
+    }));
+  }
+  setCategoryId({ target }) {
+    this.setState(() => ({ categoryId: target.value }));
+  }
   getPercentage({
     currentBalance,
     max,
@@ -20,65 +41,63 @@ class CategoriesSection extends Component {
     value = currentBalance > 0 && value < 1 ? 1 : value;
     return value;
   }
-  renderCardAndDrawer() {
-    return this.props.categories.map((category) => {
-      const percent = this.getPercentage({
-        currentBalance: category.currentBalance,
-        max: category.max,
+  renderOptions() {
+    return this.props.categories.map((category) => (
+      <option value={category.id}>{category.name}</option>
+    ));
+  }
+
+  renderCategory() {
+    return this.props.categories
+      .filter((category) => category.id === this.state.categoryId)
+      .map((category) => {
+        const percent = this.getPercentage({
+          currentBalance: category.currentBalance,
+          max: category.max,
+        });
+        let color = 'success';
+        if (percent >= 75 && percent < 90) {
+          color = 'warning';
+        } else if (percent >= 75 && percent >= 90) {
+          color = 'danger';
+        }
+        const difference = FinancialHelpers.currencyFormatted(
+          category.max - category.currentBalance
+        );
+        return (
+          <Tile>
+            <h4>{category.name}</h4>
+            <h4>{difference}</h4>
+            <progress
+              className={`progress progress-${color}`}
+              value={percent > 100 ? 100 : percent}
+              max="100"
+            />
+          </Tile>
+        );
       });
-      let color = 'success';
-      if (percent >= 75 && percent < 90) {
-        color = 'warning';
-      } else if (percent >= 75 && percent >= 90) {
-        color = 'danger';
-      }
-      const p = (
-        <progress
-          className={`progress progress-${color}`}
-          value={percent > 100 ? 100 : percent}
-          max="100"
-        />);
-      const currentBalance = FinancialHelpers.currencyFormatted(
-        category.currentBalance
-      );
-      const max = FinancialHelpers.currencyFormatted(category.max);
-      const params = {
-        title: category.name,
-        titleIcon: category.name,
-        subtitle: `${currentBalance} / ${max}`,
-        subtitleIcon: 'usd',
-        focusText: p,
-        focusTextIcon: undefined,
-        collectionType: 'Categories',
-        doc: { _id: category.name },
-        hideDrawer: true,
-        urlHandle: `/categories/${category.id}`,
-      };
-      return <CardAndDraw key={category.name} {...params} />;
-    });
   }
   render() {
-    return (
-      <div className="page">
-        <div className="container">
-          {
-            this.props.isLoading ? (<Loader />) : (
-              <div>
-                <h2>{this.props.month} {this.props.year}</h2>
-                {this.renderCardAndDrawer()}
-              </div>
-            )
-          }
-        </div>
+    return this.props.isLoading ? (<Loader />) : (
+      <div>
+        <Tile>
+          <Select
+            ref={(categorySelector) => { this.categorySelector = categorySelector; }}
+            onChange={this.setCategoryId}
+          >
+            {this.renderOptions()}
+          </Select>
+        </Tile>
+        {this.renderCategory()}
       </div>
     );
   }
 }
 CategoriesSection.propTypes = {
-  categories: React.PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  month: React.PropTypes.string.isRequired,
-  year: React.PropTypes.string.isRequired,
+  // month: PropTypes.string,
+  // year: PropTypes.string,
 };
 
 const qCategoriesForBudget = gql`

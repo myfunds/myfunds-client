@@ -25,7 +25,6 @@
     "apollo-client": "^0.8.7",
     "auth0-lock": "^10.11.0",
     "babel-runtime": "6.x",
-    "bootstrap": "4.0.0-alpha.2",
     "file-loader": "^0.10.0",
     "font-awesome": "^4.7.0",
     "glamor": "^2.20.24",

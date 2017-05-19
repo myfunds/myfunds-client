@@ -1,5 +1,6 @@
 /* eslint no-param-reassign: 0 */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { render } from 'react-dom';
 import {
   BrowserRouter as Router,
@@ -69,9 +70,14 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 );
 
 PrivateRoute.propTypes = {
-  component: PropTypes.object.isRequired,
-  rest: PropTypes.object.isRequired,
-  location: PropTypes.string.isRequired,
+  component: PropTypes.func.isRequired,
+  rest: PropTypes.object,
+  location: PropTypes.string,
+};
+
+PrivateRoute.defaultProps = {
+  rest: {},
+  location: '/',
 };
 
 if (typeof document !== 'undefined' && typeof client !== 'undefined') {

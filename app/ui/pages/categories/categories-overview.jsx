@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import {
@@ -88,8 +89,8 @@ class CategoriesOverview extends Component {
 }
 
 CategoriesOverview.propTypes = {
-  groups: React.PropTypes.array.isRequired,
-  budgets: React.PropTypes.array.isRequired,
+  groups: PropTypes.array.isRequired,
+  budgets: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
 };
 
