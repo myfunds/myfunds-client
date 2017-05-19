@@ -1,7 +1,10 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Loader from '../loader/loader.jsx';
+import Fieldset from '../Fieldset';
+import Input from '../Input';
 
 class UpdateProfileCategoryMax extends Component {
   constructor(props) {
@@ -27,9 +30,9 @@ class UpdateProfileCategoryMax extends Component {
   }
   render() {
     return this.props.isLoading ? <Loader /> : (
-      <fieldset key={this.props.category.name} className="form-group">
+      <Fieldset key={this.props.category.name}>
         <label htmlFor="first-name">What is your budget for {this.props.category.name}?</label>
-        <input
+        <Input
           ref={max => { this.max = max; }}
           onBlur={this.handleSubmit}
           defaultValue={this.props.category.max}
@@ -39,7 +42,7 @@ class UpdateProfileCategoryMax extends Component {
           name={`categories.${this.props.category.name}`}
           placeholder={this.props.category.max}
         />
-      </fieldset>
+      </Fieldset>
     );
   }
 }

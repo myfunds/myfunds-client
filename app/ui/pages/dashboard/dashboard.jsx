@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
@@ -6,37 +7,34 @@ import Loader from '../../components/loader/loader.jsx';
 import AddTransaction from '../../components/add-transaction/add-transaction.jsx';
 import MonthsSpending from '../../components/months-spending/months-spending.jsx';
 // import NetWorth from '../../components/net-worth/net-worth.jsx';
+import Tile from '../../components/Tile';
 
 function Dashboard(props) {
-  return (
-    <div className="page">
-      <div className="container">
-        {
-          props.isLoading ? (<Loader />) : (<div>
-            <MonthsSpending
-              categories={props.categories}
-            />
-            <AddTransaction
-              isOpen
-              noIcon
-              isLoading={false}
-              categories={props.categories}
-              financialAccounts={props.financialAccounts}
-              refetch={props.refetch}
-            />
-            {/* <NetWorth
-              financialAccounts={props.financialAccounts}
-            /> */}
-          </div>)
-        }
-      </div>
-    </div>
-  );
+  return props.isLoading ? (<Loader />) : (<div>
+    <Tile>
+      <AddTransaction
+        isOpen
+        noIcon
+        isLoading={false}
+        categories={props.categories}
+        financialAccounts={props.financialAccounts}
+        refetch={props.refetch}
+      />
+    </Tile>
+    {/* <NetWorth
+      financialAccounts={props.financialAccounts}
+    /> */}
+    <Tile>
+      <MonthsSpending
+        categories={props.categories}
+      />
+    </Tile>
+  </div>);
 }
 
 Dashboard.propTypes = {
-  financialAccounts: React.PropTypes.array.isRequired,
-  categories: React.PropTypes.array.isRequired,
+  financialAccounts: PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
   refetch: PropTypes.func.isRequired,
 };

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Week from './week.jsx';
 import DayNames from './dayNames.jsx';
 
@@ -82,8 +83,8 @@ export default class Calendar extends Component {
 }
 
 Calendar.propTypes = {
-  shouldShow: React.PropTypes.bool.isRequired,
-  getSelectedDate: React.PropTypes.func.isRequired,
+  shouldShow: PropTypes.bool.isRequired,
+  getSelectedDate: PropTypes.func.isRequired,
   selected: PropTypes.object.isRequired,
   isAbsolute: PropTypes.object,
 };

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import EditTransaction from '../edit-transaction/edit-transaction.jsx';
 
@@ -175,7 +176,7 @@ CardAndDraw.defaultProps = {
 };
 
 CardAndDraw.contextTypes = {
-  router: React.PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
 };
 
 export default withRouter(CardAndDraw);

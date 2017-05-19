@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -6,6 +7,10 @@ import moment from 'moment';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Loader from '../loader/loader.jsx';
 import Calendar from '../react-calendar/calendar.jsx';
+
+import Button from '../Button';
+import Input from '../Input';
+import Select from '../Select';
 
 // import './rotateIcon.css'; // TODO: this needs to imported into the scss?????? why wasn't????
 
@@ -23,7 +28,7 @@ class AddTransaction extends Component {
     };
   }
   setShowDate() {
-    // TODO: make the date not an input field
+    // TODO: make the date not an Input field
     document.activeElement.blur();
     const updateState = {};
     updateState.transactionDateShow = true;
@@ -39,7 +44,7 @@ class AddTransaction extends Component {
     const categories = this.props.categories;
     const financialAccounts = this.props.financialAccounts;
     return (
-      <select
+      <Select
         key={key}
         ref={(ref) => { this[key] = ref; }}
         defaultValue={null}
@@ -59,7 +64,7 @@ class AddTransaction extends Component {
             {financialAccount.name}
           </option>
         ))}
-      </select>
+      </Select>
     );
   }
   toggleOpen() {
@@ -137,60 +142,52 @@ class AddTransaction extends Component {
             <form className="new-budget" onSubmit={this.handleSubmit} >
               <div className="row">
                 <div className="col-xs-6">
-                  <fieldset className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      ref={(ref) => { this.description = ref; }}
-                      placeholder="Description"
-                    />
-                  </fieldset>
+                  <Input
+                    className="form-control"
+                    type="text"
+                    ref={(ref) => { this.description = ref; }}
+                    placeholder="Description"
+                  />
                 </div>
                 <div className="col-xs-6">
-                  <fieldset className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      ref={(ref) => { this.amount = ref; }}
-                      placeholder="Amount"
-                    />
-                  </fieldset>
+                  <Input
+                    className="form-control"
+                    type="text"
+                    ref={(ref) => { this.amount = ref; }}
+                    placeholder="Amount"
+                  />
                 </div>
               </div>
               <div className="row">
-                <div className="col-xs-6">
-                  <fieldset className="form-group">
-                    {this.getParentsDropDown('positiveParentId')}
-                  </fieldset>
-                </div>
-                <div className="col-xs-6">
-                  <fieldset className="form-group">
-                    {this.getParentsDropDown('negativeParentId')}
-                  </fieldset>
-                </div>
                 <div className="col-xs-12">
-                  <fieldset className="form-group">
-                    {/* <label htmlFor='transactionDate'> Date </label> */}
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="transactionDate"
-                      ref={(ref) => { this.transactionDate = ref; }}
-                      onFocus={this.setShowDate}
-                      value={this.state.transactionDate.format('ddd D MMM YYYY')}
-                    />
-                    <Calendar
-                      shouldShow={this.state.transactionDateShow}
-                      selected={this.state.transactionDate}
-                      getSelectedDate={this.setTransactionDate}
-                    />
-                  </fieldset>
+                  {/* <label htmlFor='transactionDate'> Date </label> */}
+                  <Input
+                    className="form-control"
+                    type="text"
+                    name="transactionDate"
+                    ref={(ref) => { this.transactionDate = ref; }}
+                    onFocus={this.setShowDate}
+                    value={this.state.transactionDate.format('ddd D MMM YYYY')}
+                  />
+                  <Calendar
+                    shouldShow={this.state.transactionDateShow}
+                    selected={this.state.transactionDate}
+                    getSelectedDate={this.setTransactionDate}
+                  />
+                </div>
+                <div className="col-xs-6">
+                  {this.getParentsDropDown('positiveParentId')}
+                </div>
+                <div className="col-xs-6">
+                  {this.getParentsDropDown('negativeParentId')}
+                </div>
+
+              </div>
+              <div className="row">
+                <div className="col-xs-12">
+                  <Button type="submit">Submit</Button>
                 </div>
               </div>
-
-              <fieldset className="form-group">
-                <button className="btn btn-success form-control" type="submit">Submit</button>
-              </fieldset>
             </form>
             }
           </ReactCSSTransitionGroup>

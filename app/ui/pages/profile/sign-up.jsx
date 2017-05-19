@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-class CreateUser extends React.Component {
+class CreateUser extends Component {
 
   static propTypes = {
-    router: React.PropTypes.object.isRequired,
-    createUser: React.PropTypes.func.isRequired,
-    data: React.PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
+    createUser: PropTypes.func.isRequired,
+    data: PropTypes.object.isRequired,
   }
 
   state = {

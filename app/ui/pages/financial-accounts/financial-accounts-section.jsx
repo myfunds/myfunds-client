@@ -1,88 +1,99 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import CardAndDraw from '../../components/card-drawer/card-drawer.jsx';
+import { Link } from 'react-router-dom';
 import Loader from '../../components/loader/loader.jsx';
-import AddFinancialAccount from '../../components/add-financial-account/add-financial-account.jsx';
-
+import Tile from '../../components/Tile';
+import Select from '../../components/Select';
+import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
 
 class FinancialAccountSection extends Component {
   constructor(props) {
     super(props);
 
     this.toggleAddNewAccount = this.toggleAddNewAccount.bind(this);
+    this.renderOptions = this.renderOptions.bind(this);
+    this.renderFinancialAccount = this.renderFinancialAccount.bind(this);
+    this.setFinancialAccountId = this.setFinancialAccountId.bind(this);
 
     this.state = {
       addNewAccount: false,
+      financialAccountId: props.financialAccounts &&
+        props.financialAccounts[0] &&
+        props.financialAccounts[0].id
     };
   }
-  getParams() {
-    const doc = {
-      name: '',
-      type: '',
-      openingBalance: '',
-    };
-    const docLabels = {
-      name: 'What do you want to call the account?',
-      type: 'What type of account is it?',
-      openingBalance: 'How much money is in it right now?',
-    };
-    return {
-      doc,
-      docLabels,
-      type: 'FinancialAccounts',
-      toggle: this.toggleAddNewAccount.bind(this),
-    };
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(() => ({
+      financialAccountId: nextProps.financialAccounts &&
+        nextProps.financialAccounts[0] &&
+        nextProps.financialAccounts[0].id
+    }));
+  }
+  setFinancialAccountId({ target }) {
+    this.setState(() => ({ financialAccountId: target.value }));
   }
   toggleAddNewAccount() {
-    this.setState({
-      addNewAccount: !this.state.addNewAccount,
-    });
+    this.setState((state) => ({ addNewAccount: !state.addNewAccount }));
   }
-  renderCardAndDrawer() {
-    return this.props.financialAccounts.map((financialAccount) => {
-      const params = {
-        title: financialAccount.name,
-        titleIcon: financialAccount.type,
-        subtitle: financialAccount.type,
-        subtitleIcon: 'money',
-        focusText: financialAccount.currentBalance.toFixed(2),
-        focusTextIcon: 'usd',
-        collectionType: 'FinancialAccounts',
-        doc: financialAccount,
-        urlHandle: `/accounts/${financialAccount.id}`,
-      };
-      return <CardAndDraw key={financialAccount.id} {...params} />;
-    });
+  renderOptions() {
+    return this.props.financialAccounts.map((financialAccount) => (
+      <option value={financialAccount.id}>{financialAccount.name}</option>
+    ));
+  }
+
+  renderFinancialAccount() {
+    return this.props.financialAccounts
+      .filter((financialAccount) => financialAccount.id === this.state.financialAccountId)
+      .map((financialAccount) => {
+        const currentBalance = FinancialHelpers.currencyFormatted(
+          financialAccount.currentBalance
+        );
+        return (
+          <Link to={`/accounts/${financialAccount.id}`}>
+            <Tile>
+              <h4>{financialAccount.name}</h4>
+              <h4>{currentBalance}</h4>
+            </Tile>
+          </Link>
+        );
+      });
   }
   render() {
-    return (
-      <div className="page">
-        <div className="container">
-          {
-            this.props.isLoading ? (<Loader />) : (
-              <div className="financialAccounts">
-                <AddFinancialAccount
-                  isLoading={false}
-                  categories={[]}
-                  financialAccounts={[]}
-                  refetch={this.props.refetch}
-                  text="Financial Accounts"
-                />
-                { this.renderCardAndDrawer() }
-              </div>
-            )
-          }
-        </div>
+    return this.props.isLoading ? (<Loader />) : (
+      <div>
+        <Tile>
+          <Select onChange={this.setFinancialAccountId}>
+            {this.renderOptions()}
+          </Select>
+        </Tile>
+        {this.renderFinancialAccount()}
       </div>
     );
   }
 }
 
+/*
+
+<div className="financialAccounts">
+  <AddFinancialAccount
+    isLoading={false}
+    categories={[]}
+    financialAccounts={[]}
+    refetch={this.props.refetch}
+    text="Financial Accounts"
+  />
+  { this.renderCardAndDrawer() }
+</div>
+
+*/
+
 FinancialAccountSection.propTypes = {
-  financialAccounts: React.PropTypes.array.isRequired,
+  financialAccounts: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  refetch: PropTypes.func.isRequired,
+  // refetch: PropTypes.func.isRequired,
 };
 
 const qFinancialAccounts = gql`
