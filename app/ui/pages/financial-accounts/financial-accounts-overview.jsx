@@ -1,36 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import TransactionsByParent from '../transactions/transactions-section.jsx';
-import Tile from '../../components/Tile';
 import Loader from '../../components/loader/loader.jsx';
 
-class FinancialAccountOverview extends Component {
-  renderCardAndDrawer() {
-    return (
-      <Tile>
-        <h2>{this.props.financialAccount.name}</h2>
-        <h4>{this.props.financialAccount.currentBalance.toFixed(2)}</h4>
-      </Tile>
-    );
-  }
-
-  render() {
-    return this.props.isLoading || !this.props.financialAccount.id ? (<Loader />) : (
-      <div>
-        {this.renderCardAndDrawer()}
-        <TransactionsByParent
-          refetch={this.props.refetch}
-          transactions={
-            this.props.financialAccount
-            .positiveTransactions
-            .concat(this.props.financialAccount.negativeTransactions)}
-        />
-      </div>
-    );
-  }
-}
+const FinancialAccountOverview = ({
+  isLoading,
+  financialAccount,
+  refetch,
+}) => (isLoading || !financialAccount.id ? (<Loader />) : (
+  <TransactionsByParent
+    refetch={refetch}
+    parentId={financialAccount.id}
+    transactions={
+      financialAccount
+      .positiveTransactions
+      .concat(financialAccount.negativeTransactions)}
+  />
+));
 
 FinancialAccountOverview.propTypes = {
   financialAccount: PropTypes.object.isRequired,
@@ -102,7 +90,7 @@ const FinancialAccountOverviewWithData = graphql(qFinancialAccountOverview, {
   options(props) {
     return {
       variables: {
-        financialAccountId: props.match.params.financialAccountId,
+        financialAccountId: props.financialAccountId,
       },
     };
   },
@@ -121,7 +109,7 @@ const FinancialAccountOverviewWithData = graphql(qFinancialAccountOverview, {
     ownProps,
     isLoading: loading,
     financialAccount: prepareFiancialAccount(FinancialAccount) || {},
-    financialAccountId: ownProps.match.params.financialAccountId,
+    financialAccountId: ownProps.financialAccountId,
     refetch,
   }),
 })(FinancialAccountOverview);

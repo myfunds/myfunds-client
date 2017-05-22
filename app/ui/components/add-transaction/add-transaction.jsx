@@ -21,10 +21,18 @@ class AddTransaction extends Component {
     this.toggleOpen = this.toggleOpen.bind(this);
     this.setShowDate = this.setShowDate.bind(this);
     this.setTransactionDate = this.setTransactionDate.bind(this);
+    this.positiveParentId = this.positiveParentId.bind(this);
+    this.negativeParentId = this.negativeParentId.bind(this);
+    this.amount = this.amount.bind(this);
+    this.description = this.description.bind(this);
     this.state = {
       open: this.props.isOpen,
       transactionDate: moment.utc(),
       transactionDateShow: false,
+      positiveParentId: '',
+      negativeParentId: '',
+      amount: 0,
+      description: '',
     };
   }
   setShowDate() {
@@ -40,13 +48,14 @@ class AddTransaction extends Component {
     updateState.transactionDateShow = false;
     this.setState(updateState);
   }
+
   getParentsDropDown(key) {
     const categories = this.props.categories;
     const financialAccounts = this.props.financialAccounts;
     return (
       <Select
         key={key}
-        ref={(ref) => { this[key] = ref; }}
+        onChange={this[key]}
         defaultValue={null}
         className="form-control c-select"
       >
@@ -67,6 +76,26 @@ class AddTransaction extends Component {
       </Select>
     );
   }
+  positiveParentId({ target }) {
+    this.setState(() => ({
+      positiveParentId: target.value,
+    }));
+  }
+  negativeParentId({ target }) {
+    this.setState(() => ({
+      negativeParentId: target.value,
+    }));
+  }
+  amount({ target }) {
+    this.setState(() => ({
+      amount: target.value,
+    }));
+  }
+  description({ target }) {
+    this.setState(() => ({
+      description: target.value,
+    }));
+  }
   toggleOpen() {
     this.setState({
       open: !this.state.open,
@@ -74,17 +103,17 @@ class AddTransaction extends Component {
   }
   handleSubmit(event) {
     event.preventDefault();
-    const description = this.description.value;
-    const amount = this.amount.value ? parseFloat(this.amount.value) : 0;
-    const positiveParentId = this.positiveParentId.value;
-    const negativeParentId = this.negativeParentId.value;
-    const transactionDate = moment(this.transactionDate.value, 'ddd D MMM YYYY').toISOString();
+    const description = this.state.description;
+    const amount = this.state.amount ? parseFloat(this.state.amount) : 0;
+    const positiveParentId = this.state.positiveParentId;
+    const negativeParentId = this.state.negativeParentId;
+    const transactionDate = this.state.transactionDate.toISOString();
 
-    const positiveCategoryId = this.positiveParentId.value.includes('category|') ? this.positiveParentId.value.split('category|')[1] : undefined;
-    const positiveFinancialAccountId = this.positiveParentId.value.includes('financialAccount|') ? this.positiveParentId.value.split('financialAccount|')[1] : undefined;
-    const negativeCategoryId = this.negativeParentId.value.includes('category|') ? this.negativeParentId.value.split('category|')[1] : undefined;
-    const negativeFinancialAccountId = this.negativeParentId.value.includes('financialAccount|') ? this.negativeParentId.value.split('financialAccount|')[1] : undefined;
-    if (!negativeParentId || !positiveParentId || !description || !amount) {
+    const positiveCategoryId = this.state.positiveParentId.includes('category|') ? this.state.positiveParentId.split('category|')[1] : undefined;
+    const positiveFinancialAccountId = this.state.positiveParentId.includes('financialAccount|') ? this.state.positiveParentId.split('financialAccount|')[1] : undefined;
+    const negativeCategoryId = this.state.negativeParentId.includes('category|') ? this.state.negativeParentId.split('category|')[1] : undefined;
+    const negativeFinancialAccountId = this.state.negativeParentId.includes('financialAccount|') ? this.state.negativeParentId.split('financialAccount|')[1] : undefined;
+    if (!negativeParentId || !positiveParentId || !description || !amount || !transactionDate) {
       console.warn('THIS FAILED, PLEASE SELECT VALUES');
       return;
     }
@@ -97,8 +126,8 @@ class AddTransaction extends Component {
       negativeFinancialAccountId,
       transactionDate,
     }).then(() => {
-      this.description.value = '';
-      this.amount.value = '';
+      this.state.description = '';
+      this.state.amount = '';
       return this.props.refetch();
     }).catch((error) => {
       console.warn('there was an error sending the Mutation', error);
@@ -145,7 +174,8 @@ class AddTransaction extends Component {
                   <Input
                     className="form-control"
                     type="text"
-                    ref={(ref) => { this.description = ref; }}
+                    onChange={this.description}
+                    value={this.state.description}
                     placeholder="Description"
                   />
                 </div>
@@ -153,7 +183,8 @@ class AddTransaction extends Component {
                   <Input
                     className="form-control"
                     type="text"
-                    ref={(ref) => { this.amount = ref; }}
+                    onChange={this.amount}
+                    value={this.state.amount}
                     placeholder="Amount"
                   />
                 </div>

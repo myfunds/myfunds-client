@@ -1,20 +1,47 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import glamorous from 'glamorous';
 import EditTransaction from '../edit-transaction/edit-transaction.jsx';
 import './LineItem.scss';
+
+const TransactionRow = glamorous.div({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+const TransactionColumn = glamorous.div({
+  // padding: '6px'
+});
+const LineOptions = glamorous.div({
+  position: 'absolute',
+  top: '0',
+  left: '0',
+  right: '0',
+  bottom: '0',
+  display: 'flex',
+  justifyContent: 'space-around',
+  background: 'rgba(0, 0, 0, 0.85)',
+});
 
 class LineItem extends Component {
   constructor(props) {
     super(props);
     this.toggleEdit = ::this.toggleEdit;
+    this.toggleShowOptions = ::this.toggleShowOptions;
     this.state = {
       edit: false,
+      showOptions: false,
     };
   }
 
   toggleEdit() {
     this.setState({
       edit: !this.state.edit,
+    });
+  }
+  toggleShowOptions() {
+    this.setState({
+      showOptions: !this.state.showOptions,
     });
   }
   render() {
@@ -38,10 +65,9 @@ class LineItem extends Component {
       refetch,
     } = this.props;
     return (
-      <div className="list-item animated fadeInLeft">
-        <div className="row">
-          <div className="col-xs-5">
-
+      <div onClick={this.toggleShowOptions} className="list-item animated fadeInLeft">
+        <TransactionRow>
+          <TransactionColumn>
             <div className="list-item__title">
               {!titleIcon ?
                 null :
@@ -49,8 +75,6 @@ class LineItem extends Component {
               }
               {title}
             </div>
-          </div>
-          <div className="col-xs-5">
             <div className="list-item__subtitle text-muted">
               {!subtitleIcon ?
                 null :
@@ -58,6 +82,8 @@ class LineItem extends Component {
               }
               {subtitle}
             </div>
+          </TransactionColumn>
+          <TransactionColumn>
             <div className="list-item__focus-text" >
               {!focusTextIcon ?
                 null :
@@ -65,8 +91,16 @@ class LineItem extends Component {
               }
               {focusText}
             </div>
-          </div>
-          <div className="col-xs-2">
+          </TransactionColumn>
+        </TransactionRow>
+        {this.state.showOptions &&
+          <LineOptions>
+            <div
+              className="list-item__delete-button"
+              onClick={onDelete}
+            >
+              { this.state.edit ? null : <i className="fa fa-trash" aria-hidden="true" /> }
+            </div>
             <div
               className="list-item__edit-button"
               onClick={this.toggleEdit}
@@ -74,13 +108,13 @@ class LineItem extends Component {
               { this.state.edit ? <i className="fa fa-times" aria-hidden="true" /> : <i className="fa fa-edit" aria-hidden="true" /> }
             </div>
             <div
-              className="list-item__delete-button"
-              onClick={onDelete}
+              className="list-item__close-button"
+              onClick={this.toggleShowOptions}
             >
-              { this.state.edit ? null : <i className="fa fa-trash" aria-hidden="true" /> }
+              { this.state.edit ? null : <i className="fa fa-times" aria-hidden="true" /> }
             </div>
-          </div>
-        </div>
+          </LineOptions>
+        }
         <EditTransaction
           _id={doc._id}
           financialAccounts={financialAccounts || []}

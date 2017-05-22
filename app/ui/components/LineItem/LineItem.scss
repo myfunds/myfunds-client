@@ -4,6 +4,7 @@
   margin: 0 0 4px;
   border-radius: 3px;
   background-color: #fff;
+  position: relative;
 
   .list-item__title{
     font-size: 14px;
@@ -12,15 +13,16 @@
     }
   }
   .list-item__subtitle{
-    text-align: right;
     font-size: 12px;
+    padding: 12px 0px 0px;
     i{
-      margin: 0 6px 0 12px;
+      margin: 0 6px 0 0;
     }
   }
   .list-item__focus-text{
     font-size: 18px;
     text-align: right;
+    white-space: nowrap;
     i{
       margin: 0 6px 0 12px;
     }
@@ -30,15 +32,41 @@
     margin: 6px 0;
     text-align: center;
     background: orange;
-    border-radius: 3px;
     box-shadow: 0px 2px 3px -1px grey;
+
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    line-height: 48px;
+    font-size: 30px;
+
   }
   .list-item__delete-button{
     display: block;
     margin: 6px 0;
     text-align: center;
     background: #f64848;
-    border-radius: 3px;
     box-shadow: 0px 2px 3px -1px grey;
+
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    line-height: 48px;
+    font-size: 30px;
+
+  }
+  .list-item__close-button{
+    display: block;
+    margin: 6px 0;
+    text-align: center;
+    background: #b5b5b5;
+    box-shadow: 0px 2px 3px -1px grey;
+
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    line-height: 48px;
+    font-size: 30px;
+
   }
 }

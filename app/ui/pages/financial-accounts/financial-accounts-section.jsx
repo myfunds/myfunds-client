@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Link } from 'react-router-dom';
 import Loader from '../../components/loader/loader.jsx';
 import Tile from '../../components/Tile';
 import Select from '../../components/Select';
 import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
+import FinancialAccountOverview from './financial-accounts-overview.jsx';
 
 class FinancialAccountSection extends Component {
   constructor(props) {
@@ -52,12 +52,10 @@ class FinancialAccountSection extends Component {
           financialAccount.currentBalance
         );
         return (
-          <Link to={`/accounts/${financialAccount.id}`}>
-            <Tile>
-              <h4>{financialAccount.name}</h4>
-              <h4>{currentBalance}</h4>
-            </Tile>
-          </Link>
+          <Tile>
+            <h2 style={{ textAlign: 'center' }}><i className="fa fa-usd" />{currentBalance}</h2>
+            <FinancialAccountOverview financialAccountId={financialAccount.id}/>
+          </Tile>
         );
       });
   }

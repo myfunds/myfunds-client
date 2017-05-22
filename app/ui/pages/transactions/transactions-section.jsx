@@ -66,12 +66,36 @@ class TransactionsSection extends Component {
         .toISOString())
         .format('MM/DD/YY');
       const description = transaction.description;
+      const otherParentName = (transaction.negativeCategory
+                                && transaction.negativeCategory.id !== this.props.parentId
+                                && transaction.negativeCategory.name) ||
+                              (transaction.negativeFinancialAccount
+                                && transaction.negativeFinancialAccount.id !== this.props.parentId
+                                && transaction.negativeFinancialAccount.name) ||
+                              (transaction.positiveCategory
+                                && transaction.positiveCategory.id !== this.props.parentId
+                                && transaction.positiveCategory.name) ||
+                              (transaction.positiveFinancialAccount
+                                && transaction.positiveFinancialAccount.id !== this.props.parentId
+                                && transaction.positiveFinancialAccount.name);
+      const sign = (transaction.negativeCategory
+                      && transaction.negativeCategory.id === this.props.parentId
+                      && '-') ||
+                    (transaction.negativeFinancialAccount
+                      && transaction.negativeFinancialAccount.id === this.props.parentId
+                      && '-') ||
+                    (transaction.positiveCategory
+                      && transaction.positiveCategory.id === this.props.parentId
+                      && '') ||
+                    (transaction.positiveFinancialAccount
+                      && transaction.positiveFinancialAccount.id === this.props.parentId
+                      && '');
       const params = {
-        title: `${description} (${(transaction.negativeCategory && transaction.negativeCategory.name) || (transaction.negativeFinancialAccount && transaction.negativeFinancialAccount.name)} => ${(transaction.positiveCategory && transaction.positiveCategory.name) || (transaction.positiveFinancialAccount && transaction.positiveFinancialAccount.name)}) `,
+        title: `${description} (${otherParentName}) `,
         titleIcon: undefined,
         subtitle: `${digitDate} `,
         subtitleIcon: 'calendar',
-        focusText: FinancialHelpers.currencyFormatted(transaction.amount),
+        focusText: `${sign}${FinancialHelpers.currencyFormatted(transaction.amount)}`,
         focusTextIcon: 'usd',
         collectionType: 'Transactions',
         doc: transaction,
@@ -105,6 +129,7 @@ class TransactionsSection extends Component {
 
 TransactionsSection.propTypes = {
   transactions: PropTypes.array.isRequired,
+  parentId: PropTypes.string.isRequired,
   financialAccounts: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
