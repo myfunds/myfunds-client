@@ -54,7 +54,7 @@ class FinancialAccountSection extends Component {
         return (
           <Tile>
             <h2 style={{ textAlign: 'center' }}><i className="fa fa-usd" />{currentBalance}</h2>
-            <FinancialAccountOverview financialAccountId={financialAccount.id}/>
+            <FinancialAccountOverview financialAccountId={financialAccount.id} />
           </Tile>
         );
       });
