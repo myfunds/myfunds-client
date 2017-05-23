@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import glamorous from 'glamorous';
-import EditTransaction from '../edit-transaction/edit-transaction.jsx';
-import './LineItem.scss';
+// import EditTransaction from '../edit-transaction/edit-transaction.jsx';
 
 const TransactionRow = glamorous.div({
   display: 'flex',
@@ -21,6 +20,76 @@ const LineOptions = glamorous.div({
   display: 'flex',
   justifyContent: 'space-around',
   background: 'rgba(0, 0, 0, 0.85)',
+});
+
+const ListItem = glamorous.div({
+  padding: '12px 12px',
+  boxShadow: '0px 2px 6px -1px grey',
+  margin: '0 0 4px',
+  borderRadius: '3px',
+  backgroundColor: '#fff',
+  position: 'relative',
+});
+
+const ListItemTitle = glamorous.div({
+  fontSize: '14px',
+  '& i': {
+    margin: '0 6px 0 12px',
+  }
+});
+const ListItemSubTitle = glamorous.div({
+  fontSize: '12px',
+  padding: '12px 0px 0px',
+  '& i': {
+    margin: '0 6px 0 0',
+  }
+});
+const ListItemFocusText = glamorous.div({
+  fontSize: '18px',
+  textAlign: 'right',
+  whiteSpace: 'nowrap',
+  '& i': {
+    margin: '0 6px 0 12px',
+  }
+});
+const ListItemEditButton = glamorous.div({
+  display: 'block',
+  margin: '6px 0',
+  textAlign: 'center',
+  background: 'orange',
+  boxShadow: '0px 2px 3px -1px grey',
+
+  width: '48px',
+  height: '48px',
+  borderRadius: '24px',
+  lineHeight: '48px',
+  fontSize: '30px',
+});
+const ListItemDeleteButton = glamorous.div({
+  display: 'block',
+  margin: '6px 0',
+  textAlign: 'center',
+  background: '#f64848',
+  boxShadow: '0px 2px 3px -1px grey',
+
+  width: '48px',
+  height: '48px',
+  borderRadius: '24px',
+  lineHeight: '48px',
+  fontSize: '30px',
+});
+const ListItemCloseButton = glamorous.div({
+  display: 'block',
+  margin: '6px 0',
+  textAlign: 'center',
+  background: '#b5b5b5',
+  boxShadow: '0px 2px 3px -1px grey',
+
+  width: '48px',
+  height: '48px',
+  borderRadius: '24px',
+  lineHeight: '48px',
+  fontSize: '30px',
 });
 
 class LineItem extends Component {
@@ -56,66 +125,63 @@ class LineItem extends Component {
       focusText,
 
       // id,
-      financialAccounts,
-      categories,
-      doc,
+      // financialAccounts,
+      // categories,
+      // doc,
       // isLoading,
       // transactionUpdate,
       // text,
-      refetch,
+      // refetch,
     } = this.props;
     return (
-      <div onClick={this.toggleShowOptions} className="list-item animated fadeInLeft">
+      <ListItem onClick={this.toggleShowOptions}>
         <TransactionRow>
           <TransactionColumn>
-            <div className="list-item__title">
+            <ListItemTitle>
               {!titleIcon ?
                 null :
                 <i className={`fa fa-${titleIcon}`} />
               }
               {title}
-            </div>
-            <div className="list-item__subtitle text-muted">
+            </ListItemTitle>
+            <ListItemSubTitle>
               {!subtitleIcon ?
                 null :
                 <i className={`fa fa-${subtitleIcon}`} />
               }
               {subtitle}
-            </div>
+            </ListItemSubTitle>
           </TransactionColumn>
           <TransactionColumn>
-            <div className="list-item__focus-text" >
+            <ListItemFocusText>
               {!focusTextIcon ?
                 null :
                 <i className={`fa fa-${focusTextIcon}`} />
               }
               {focusText}
-            </div>
+            </ListItemFocusText>
           </TransactionColumn>
         </TransactionRow>
         {this.state.showOptions &&
           <LineOptions>
-            <div
-              className="list-item__delete-button"
+            <ListItemDeleteButton
               onClick={onDelete}
             >
               { this.state.edit ? null : <i className="fa fa-trash" aria-hidden="true" /> }
-            </div>
-            <div
-              className="list-item__edit-button"
+            </ListItemDeleteButton>
+            <ListItemEditButton
               onClick={this.toggleEdit}
             >
               { this.state.edit ? <i className="fa fa-times" aria-hidden="true" /> : <i className="fa fa-edit" aria-hidden="true" /> }
-            </div>
-            <div
-              className="list-item__close-button"
+            </ListItemEditButton>
+            <ListItemCloseButton
               onClick={this.toggleShowOptions}
             >
               { this.state.edit ? null : <i className="fa fa-times" aria-hidden="true" /> }
-            </div>
+            </ListItemCloseButton>
           </LineOptions>
         }
-        <EditTransaction
+        {/* <EditTransaction
           _id={doc._id}
           financialAccounts={financialAccounts || []}
           categories={categories || []}
@@ -123,8 +189,8 @@ class LineItem extends Component {
           doc={doc}
           open={this.state.edit}
           refetch={refetch}
-        />
-      </div>
+        /> */}
+      </ListItem>
     );
   }
 }
@@ -140,13 +206,13 @@ LineItem.propTypes = {
   focusTextIcon: PropTypes.string,
 
   // id: PropTypes.string.isRequired,
-  financialAccounts: PropTypes.array.isRequired,
-  categories: PropTypes.array.isRequired,
-  doc: PropTypes.object.isRequired,
+  // financialAccounts: PropTypes.array.isRequired,
+  // categories: PropTypes.array.isRequired,
+  // doc: PropTypes.object.isRequired,
   // isLoading: PropTypes.bool.isRequired,
   // transactionUpdate: PropTypes.func.isRequired,
   // text: PropTypes.string,
-  refetch: PropTypes.func.isRequired,
+  // refetch: PropTypes.func.isRequired,
 };
 
 LineItem.defaultProps = {

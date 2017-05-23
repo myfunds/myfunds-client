@@ -4,12 +4,12 @@
   "description": "A boilerplate for React-Babel-Webpack project",
   "main": "app/main.jsx",
   "scripts": {
-    "storybook": "start-storybook -p 9001 -c .storybook",
-    "precommit": "npm run lint",
+    "storybook": "start-storybook -p 8001 -c .storybook",
+    "precommit": "npm run lint && jest",
     "commitmsg": "npm run lint:msg",
     "lint": "eslint --cache --ext .jsx,.js --format=node_modules/eslint-formatter-pretty .",
     "lint:msg": "validate-commit-msg",
-    "test": "npm run lint",
+    "test": "npm run lint && jest",
     "build": "webpack",
     "start": "webpack-dev-server --progress --hot --content-base app",
     "start:prod": "node server.bundle.js",
@@ -46,7 +46,7 @@
     "url-loader": "^0.5.7"
   },
   "devDependencies": {
-    "@kadira/storybook": "^2.35.3",
+    "@storybook/react": "alpha",
     "babel-core": "6.x",
     "babel-eslint": "7.x",
     "babel-loader": "6.x",
@@ -69,6 +69,7 @@
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "latest",
     "husky": "^0.12.0",
+    "jest": "^20.0.3",
     "open-browser-webpack-plugin": "0.0.3",
     "sass-loader": "^6.0.1",
     "style-loader": "~0.13.1",
