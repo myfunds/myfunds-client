@@ -1,0 +1,43 @@
+<head>
+    <title></title>
+    <style>
+      p { text-align: center }
+    </style>
+</head>
+<body>
+    <button id="add-stylesheet">Stylesheet</button>
+    <button id="add-inline-styles">Inline</button>
+    <script type="text/javascript">
+        let stylesheet = document.getElementById('add-stylesheet');
+        let inline = document.getElementById('add-inline-styles');
+
+        stylesheet.addEventListener('click', addStylesheet);
+        inline.addEventListener('click', addInlineStyles);
+
+        function addStylesheet() {
+            let style = document.createElement("style");
+            style.appendChild(document.createTextNode(""));
+            document.head.appendChild(style);
+            style.sheet.insertRule('p { text-align: center }', 0);
+        }
+
+        function addInlineStyles() {
+            let nodes = document.getElementsByTagName('p');
+            for (let node of nodes) {
+                node.style.textAlign = 'center';
+            }
+        }
+
+        // initialize <p> elements
+        init(10000);
+        function init(numElements) {
+            for (let i = 0; i < numElements; ++i) {
+                let p = document.createElement('p');
+                p.innerText = 'testing'
+                document.body.appendChild(p);
+            }
+        }
+        // addInlineStyles();
+        // addStylesheet();
+    </script>
+</html>
