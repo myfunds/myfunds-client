@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && cp -R ./build ./buildOriginal && cp -R ./buildOriginal ./build/categories && cp -R ./buildOriginal ./build/accounts && cp -R ./buildOriginal ./build/profile  && cp -R ./buildOriginal ./build/dashboard",
+    "build": "react-scripts build && echo '/*    /index.html   200' >> ./build/_redirects",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
