@@ -158,7 +158,6 @@ const TransactionsByParent = graphql(qTransactionByParent, {
     isLoading: data.loading,
     financialAccounts: data.allFinancialAccounts || [],
     categories: data.allCategories || [],
-    refetch: data.refetch,
   })
 })(TransactionsSection);
 

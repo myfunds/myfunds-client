@@ -110,16 +110,20 @@ const FinancialAccountOverviewWithData = graphql(qFinancialAccountOverview, {
     isLoading: loading,
     financialAccount: prepareFiancialAccount(FinancialAccount) || {},
     financialAccountId: ownProps.financialAccountId,
-    refetch,
+    refetch: () => {
+      refetch && refetch();
+      ownProps.refetch && ownProps.refetch();
+    },
   }),
 })(FinancialAccountOverview);
 
 export default FinancialAccountOverviewWithData;
 
 function prepareFiancialAccount(financialAccount) {
+  let currentBalance = financialAccount && financialAccount.openingBalance + getCurrentBalance(financialAccount);
   return !financialAccount ? null : {
     ...financialAccount,
-    currentBalance: financialAccount.openingBalance + getCurrentBalance(financialAccount),
+    currentBalance,
   };
 }
 
