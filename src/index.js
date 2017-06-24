@@ -108,7 +108,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 PrivateRoute.propTypes = {
   component: PropTypes.func.isRequired,
   rest: PropTypes.object,
-  location: PropTypes.string,
+  location: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
 };
 
 PrivateRoute.defaultProps = {
