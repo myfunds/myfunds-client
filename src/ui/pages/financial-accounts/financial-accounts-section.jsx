@@ -40,7 +40,7 @@ class FinancialAccountSection extends Component {
   }
   renderOptions() {
     return this.props.financialAccounts.map((financialAccount) => (
-      <option value={financialAccount.id}>{financialAccount.name}</option>
+      <option key={financialAccount.id} value={financialAccount.id}>{financialAccount.name}</option>
     ));
   }
 
@@ -52,7 +52,7 @@ class FinancialAccountSection extends Component {
           financialAccount.currentBalance
         );
         return (
-          <Tile>
+          <Tile key={financialAccount.id}>
             <h2 style={{ textAlign: 'center' }}><i className="fa fa-usd" />{currentBalance}</h2>
             <FinancialAccountOverview financialAccountId={financialAccount.id} refetch={this.props.refetch}/>
           </Tile>

@@ -98,7 +98,7 @@ class TransactionsSection extends Component {
         focusText: `${sign}${FinancialHelpers.currencyFormatted(transaction.amount)}`,
         focusTextIcon: 'usd',
         collectionType: 'Transactions',
-        doc: transaction,
+        transaction: transaction,
         refetch: this.props.refetch,
         urlHandle: undefined,
         financialAccounts: this.props.financialAccounts,

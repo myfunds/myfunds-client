@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import glamorous from 'glamorous';
-// import EditTransaction from '../edit-transaction/edit-transaction.jsx';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import EditTransaction from '../edit-transaction/edit-transaction.jsx';
 
 const TransactionRow = glamorous.div({
   display: 'flex',
@@ -20,7 +22,17 @@ const LineOptions = glamorous.div({
   display: 'flex',
   justifyContent: 'space-around',
   background: 'rgba(0, 0, 0, 0.85)',
-});
+  transition: 'min-height 200ms ease',
+  zIndex: '1',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  borderRadius: '3px',
+  '& div:last-child': {
+    width: '100%',
+  }
+}, ({edit}) => ({
+  minHeight: edit ? '400px' : '0',
+}));
 
 const ListItem = glamorous.div({
   padding: '12px 12px',
@@ -97,26 +109,41 @@ class LineItem extends Component {
     super(props);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.toggleShowOptions = this.toggleShowOptions.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
     this.state = {
       edit: false,
       showOptions: false,
     };
   }
 
-  toggleEdit() {
+  toggleEdit(e) {
+    e.stopPropagation();
     this.setState({
       edit: !this.state.edit,
     });
   }
   toggleShowOptions() {
+    if(this.state.edit){
+      return;
+    }
     this.setState({
       showOptions: !this.state.showOptions,
     });
   }
+
+  handleDelete(){
+    this.props.onDelete({
+      id: this.props.id
+    }).then(() => {
+      return this.props.refetch();
+    }).catch((error) => {
+      console.warn('there was an error sending the Mutation', error);
+    });
+  }
+
   render() {
     const {
       // onEdit,
-      onDelete,
       titleIcon,
       title,
       subtitleIcon,
@@ -163,33 +190,33 @@ class LineItem extends Component {
           </TransactionColumn>
         </TransactionRow>
         {this.state.showOptions &&
-          <LineOptions>
-            <ListItemDeleteButton
-              onClick={onDelete}
+          <LineOptions edit={this.state.edit}>
+            { this.state.edit ? null : <ListItemDeleteButton
+              onClick={this.handleDelete}
             >
-              { this.state.edit ? null : <i className="fa fa-trash" aria-hidden="true" /> }
-            </ListItemDeleteButton>
+              <i className="fa fa-trash" aria-hidden="true" />
+            </ListItemDeleteButton> }
             <ListItemEditButton
               onClick={this.toggleEdit}
             >
               { this.state.edit ? <i className="fa fa-times" aria-hidden="true" /> : <i className="fa fa-edit" aria-hidden="true" /> }
             </ListItemEditButton>
-            <ListItemCloseButton
+            { this.state.edit ? null : <ListItemCloseButton
               onClick={this.toggleShowOptions}
             >
-              { this.state.edit ? null : <i className="fa fa-times" aria-hidden="true" /> }
-            </ListItemCloseButton>
+              <i className="fa fa-times" aria-hidden="true" />
+            </ListItemCloseButton>}
+            <EditTransaction
+              isLoading={false}
+              isOpen={this.state.edit}
+              categories={this.props.categories}
+              financialAccounts={this.props.financialAccounts}
+              transaction={this.props.transaction}
+              refetch={this.props.refetch}
+              text="Transactions"
+            />
           </LineOptions>
         }
-        {/* <EditTransaction
-          _id={doc._id}
-          financialAccounts={financialAccounts || []}
-          categories={categories || []}
-          isLoading={false}
-          doc={doc}
-          open={this.state.edit}
-          refetch={refetch}
-        /> */}
       </ListItem>
     );
   }
@@ -204,8 +231,8 @@ LineItem.propTypes = {
   subtitleIcon: PropTypes.string,
   focusText: PropTypes.string.isRequired,
   focusTextIcon: PropTypes.string,
+  id: PropTypes.string.isRequired,
 
-  // id: PropTypes.string.isRequired,
   // financialAccounts: PropTypes.array.isRequired,
   // categories: PropTypes.array.isRequired,
   // doc: PropTypes.object.isRequired,
@@ -227,4 +254,24 @@ LineItem.defaultProps = {
   focusTextIcon: null,
 };
 
-export default LineItem;
+export { LineItem };
+
+const deleteTansaction = gql`
+  mutation deleteTansaction($id: ID!){
+    deleteTransaction(id: $id){
+      id
+    }
+  }
+`;
+
+const LineItemWithData = graphql(deleteTansaction, {
+  props: ({ mutate }) => ({
+    onDelete: ({
+      id,
+    }) => mutate({ variables: {
+      id,
+    } }),
+  }),
+})(LineItem);
+
+export default LineItemWithData;
