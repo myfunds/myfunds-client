@@ -26,11 +26,14 @@ class FinancialAccountSection extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(() => ({
-      financialAccountId: nextProps.financialAccounts &&
+    const isSelected = !!nextProps.financialAccounts.find(({id}) => id === this.state.financialAccountId);
+    if(!isSelected){
+      this.setState(() => ({
+        financialAccountId: nextProps.financialAccounts &&
         nextProps.financialAccounts[0] &&
         nextProps.financialAccounts[0].id
-    }));
+      }));
+    }
   }
   setFinancialAccountId({ target }) {
     this.setState(() => ({ financialAccountId: target.value }));
