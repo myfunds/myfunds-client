@@ -2,135 +2,162 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import {
-  ResponsiveContainer,
-  ComposedChart,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
-  Area,
-  Bar,
-  Line,
-} from 'recharts';
+import moment from 'moment';
 
 import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
+import Tile from '../../components/Tile';
+import Select from '../../components/Select';
 import Loader from '../../components/loader/loader.jsx';
 
 class CategoriesOverview extends Component {
-  renderGraph(category) {
-    let average = 0;
-    let rollingTotal = 0;
-    const data = this.props.budgets.map((budget, index) => {
-      const budgetCategory = budget.categories.find(c => c.name === category);
-      const month = budget.month;
-      const balance = budgetCategory.currentBalance >= 0 ?
-        FinancialHelpers.getConvertToAmount(budgetCategory.currentBalance) :
-        FinancialHelpers.getConvertToAmount(-(budgetCategory.currentBalance));
-      rollingTotal += FinancialHelpers.getConvertToAmount(balance);
-      average = FinancialHelpers.getConvertToAmount(
-        rollingTotal / (index + 1)
-      );
-      const goal = FinancialHelpers.getConvertToAmount(budgetCategory.max);
-      const values = {
-        month,
-        balance,
-        average,
-        goal,
-      };
-      return values;
-    });
-    // balances.unshift(['Month', 'Spent', 'Average', 'Goal']);
-    return (
-      <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart
-          width={600}
-          height={400}
-          data={data}
-          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-        >
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <CartesianGrid stroke="#f5f5f5" />
-          <Bar dataKey="balance" barSize={20} fill="#413ea0" />
-          <Area type="monotone" dataKey="goal" fill="#8884d8" stroke="#8884d8" />
-          <Line type="monotone" dataKey="average" stroke="#ff7300" />
-        </ComposedChart>
-      </ResponsiveContainer>
-    );
+  constructor(props) {
+    super(props);
   }
+  getPercentage({
+    currentBalance,
+    max,
+  }) {
+    let value = currentBalance !== 0 ?
+      Math.floor(
+        ((parseFloat(currentBalance) /
+        parseFloat(max)) * 100), 0
+      ) : 0.001;
+    value = currentBalance > 0 && value < 1 ? 1 : value;
+    return value;
+  }
+
   render() {
-    return (
-      <div className="page">
-        <div className="container">
-          {
-            this.props.isLoading ? (<Loader />) : (
-              <div>
-                {
-                  this.props.groups.map(g => (
-                    <div key={g}>
-                      <h4 className="text-xs-center">
-                        {g.toUpperCase()}
-                      </h4>
-                      {this.renderGraph(g)}
-                    </div>
-                  ))
-                }
-              </div>
-            )
-          }
-        </div>
-      </div>
+    const category = this.props.categories[0] || {};
+    const percent = this.getPercentage({
+      currentBalance: category.currentBalance,
+      max: category.max,
+    });
+    let color = 'success';
+    if (percent >= 75 && percent < 90) {
+      color = 'warning';
+    } else if (percent >= 75 && percent >= 90) {
+      color = 'danger';
+    }
+    const difference = FinancialHelpers.currencyFormatted(
+      category.max - category.currentBalance
     );
+    return (
+      <Tile>
+        <h4>{category.name}</h4>
+        <h4>{difference}</h4>
+        <progress
+          className={`progress progress-${color}`}
+          value={percent > 100 ? 100 : percent}
+          max="100"
+        />
+      </Tile>
+    );
+
   }
 }
-
 CategoriesOverview.propTypes = {
-  groups: PropTypes.array.isRequired,
-  budgets: PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  // month: PropTypes.string,
+  // year: PropTypes.string,
 };
 
-const qBudgets = gql`
-query qBudgets {
-  budgets: getAllBudgets {
-    route
+const qCategoriesForBudget = gql`
+query qDashboard(
+  $auth0UserId: String!,
+  $categoryId: ID!,
+  $startDate: DateTime!,
+  $endDate: DateTime!,
+){
+  allCategories(
+    filter: {
+      id: $categoryId
+      user: {
+        auth0UserId: $auth0UserId
+      }
+    }
+  ){
+    id
     name
-    month
-    year
-    startDate
-    endDate
-    userId
-    categories{
-      name
-      max
-      currentBalance
-      userId
+    max
+    positiveTransactions(
+      filter:{
+        transactionDate_gte: $startDate,
+        transactionDate_lte: $endDate
+      }
+    ){
+      id
+      amount
+      transactionDate
+    }
+    negativeTransactions(
+      filter:{
+        transactionDate_gte: $startDate,
+        transactionDate_lte: $endDate
+      }
+    ){
+      id
+      amount
+      transactionDate
     }
   }
 }
 `;
 
-const CategoriesOverviewAllBudgets = graphql(qBudgets, {
+function getProfile() {
+  // Retrieves the profile data from local storage
+  const profile = localStorage.getItem('profile');
+  return profile ? JSON.parse(localStorage.profile) : {};
+}
+
+const CategoriesOverviewWithData = graphql(qCategoriesForBudget, {
+
+  options(props) {
+    const startDate = props.startDate;
+    const endDate = props.endDate;
+    const categoryId = props.categoryId;
+    const auth0UserId = getProfile().user_id;
+    return {
+      variables: {
+        startDate,
+        endDate,
+        categoryId,
+        auth0UserId,
+      },
+    };
+  },
+
   // ownProps are the props that are passed into the `ProfileWithData`
   // when it is used by a parent component
-  props: ({ ownProps, data: { loading, budgets, refetch } }) => ({
+  props: ({ ownProps, data: { loading, allCategories, refetch } }) => ({
     ownProps,
     isLoading: loading,
-    budgets: budgets || [],
-    groups: (
-      budgets &&
-      budgets[0] &&
-      budgets[0].categories &&
-      budgets[0].categories.map(c => c.name)
-    ) || [],
-    year: ownProps.params.year,
-    month: ownProps.params.month,
+    categories: prepareFiancialAccounts(allCategories) || [],
     refetch,
   }),
 })(CategoriesOverview);
 
-export default CategoriesOverviewAllBudgets;
+export default CategoriesOverviewWithData;
+
+function prepareFiancialAccounts(financialAccounts) {
+  return !financialAccounts || financialAccounts.length < 1 ? null :
+    financialAccounts.reduce((fas, fa) => ([...fas, {
+      ...fa,
+      currentBalance: fa.openingBalance ?
+        fa.openingBalance + getCurrentBalance(fa) :
+        getCurrentBalance(fa),
+    }]), []);
+}
+
+function getCurrentBalance(financialAccount) {
+  if (financialAccount.type === 'debt') {
+    return financialAccount.negativeTransactions
+             .reduce((total, t) => total + t.amount, 0) -
+           financialAccount.positiveTransactions
+             .reduce((total, t) => total + t.amount, 0);
+  }
+  return financialAccount.positiveTransactions
+           .reduce((total, t) => total + t.amount, 0) -
+         financialAccount.negativeTransactions
+           .reduce((total, t) => total + t.amount, 0);
+}
