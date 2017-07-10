@@ -6,19 +6,25 @@ import moment from 'moment';
 
 import FinancialHelpers from '../../../utils/helpers/financial-hepers.js';
 import Tile from '../../components/Tile';
+import Button from '../../components/Button';
 import Select from '../../components/Select';
 import Loader from '../../components/loader/loader.jsx';
+import CategoriesOverview from './categories-overview.jsx';
 
 class CategoriesSection extends Component {
   constructor(props) {
     super(props);
 
     this.renderOptions = this.renderOptions.bind(this);
-    this.renderCategory = this.renderCategory.bind(this);
     this.setCategoryId = this.setCategoryId.bind(this);
+    this.setRangeLastMonth = this.setRangeLastMonth.bind(this);
+    this.setRangeThisMonth = this.setRangeThisMonth.bind(this);
+    this.setRangePreviousMonth = this.setRangePreviousMonth.bind(this);
 
     this.state = {
-      categoryId: props.categories && props.categories[0] && props.categories[0].id
+      categoryId: props.categories && props.categories[0] && props.categories[0].id,
+      startDate: moment().startOf('month').subtract(0, 'month').toISOString(),
+      endDate: moment().endOf('month').subtract(0, 'month').toISOString(),
     };
   }
   componentWillReceiveProps(nextProps) {
@@ -29,54 +35,30 @@ class CategoriesSection extends Component {
   setCategoryId({ target }) {
     this.setState(() => ({ categoryId: target.value }));
   }
-  getPercentage({
-    currentBalance,
-    max,
-  }) {
-    let value = currentBalance !== 0 ?
-      Math.floor(
-        ((parseFloat(currentBalance) /
-        parseFloat(max)) * 100), 0
-      ) : 0.001;
-    value = currentBalance > 0 && value < 1 ? 1 : value;
-    return value;
+  setRangeLastMonth() {
+    this.setState(() => ({
+      startDate: moment().startOf('month').subtract(1, 'month').toISOString(),
+      endDate: moment().endOf('month').subtract(1, 'month').toISOString(),
+    }));
+  }
+  setRangeThisMonth() {
+    this.setState(() => ({
+      startDate: moment().startOf('month').subtract(0, 'month').toISOString(),
+      endDate: moment().endOf('month').subtract(0, 'month').toISOString(),
+    }));
+  }
+  setRangePreviousMonth() {
+    this.setState(() => ({
+      startDate: moment(this.state.startDate).startOf('month').subtract(1, 'month').toISOString(),
+      endDate: moment(this.state.endDate).endOf('month').subtract(1, 'month').toISOString(),
+    }));
   }
   renderOptions() {
     return this.props.categories.map((category) => (
-      <option value={category.id}>{category.name}</option>
+      <option key={category.id} value={category.id}>{category.name}</option>
     ));
   }
 
-  renderCategory() {
-    return this.props.categories
-      .filter((category) => category.id === this.state.categoryId)
-      .map((category) => {
-        const percent = this.getPercentage({
-          currentBalance: category.currentBalance,
-          max: category.max,
-        });
-        let color = 'success';
-        if (percent >= 75 && percent < 90) {
-          color = 'warning';
-        } else if (percent >= 75 && percent >= 90) {
-          color = 'danger';
-        }
-        const difference = FinancialHelpers.currencyFormatted(
-          category.max - category.currentBalance
-        );
-        return (
-          <Tile>
-            <h4>{category.name}</h4>
-            <h4>{difference}</h4>
-            <progress
-              className={`progress progress-${color}`}
-              value={percent > 100 ? 100 : percent}
-              max="100"
-            />
-          </Tile>
-        );
-      });
-  }
   render() {
     return this.props.isLoading ? (<Loader />) : (
       <div>
@@ -87,8 +69,15 @@ class CategoriesSection extends Component {
           >
             {this.renderOptions()}
           </Select>
+          <Button onClick={this.setRangeLastMonth}>Last Month</Button>
+          <Button onClick={this.setRangeThisMonth}>This Month</Button>
+          <Button onClick={this.setRangePreviousMonth}>Previous Month</Button>
         </Tile>
-        {this.renderCategory()}
+        <CategoriesOverview
+          startDate={this.state.startDate}
+          endDate={this.state.endDate}
+          categoryId={this.state.categoryId}
+        />
       </div>
     );
   }
@@ -96,15 +85,11 @@ class CategoriesSection extends Component {
 CategoriesSection.propTypes = {
   categories: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  // month: PropTypes.string,
-  // year: PropTypes.string,
 };
 
 const qCategoriesForBudget = gql`
 query qDashboard(
   $auth0UserId: String!,
-  $startDate: DateTime!,
-  $endDate: DateTime!,
 ){
   allCategories(
     filter: {
@@ -115,27 +100,6 @@ query qDashboard(
   ){
     id
     name
-    max
-    positiveTransactions(
-      filter:{
-        transactionDate_gte: $startDate,
-        transactionDate_lte: $endDate
-      }
-    ){
-      id
-      amount
-      transactionDate
-    }
-    negativeTransactions(
-      filter:{
-        transactionDate_gte: $startDate,
-        transactionDate_lte: $endDate
-      }
-    ){
-      id
-      amount
-      transactionDate
-    }
   }
 }
 `;
@@ -148,14 +112,10 @@ function getProfile() {
 
 const CategoriesForBudget = graphql(qCategoriesForBudget, {
 
-  options() {
-    const startDate = moment().startOf('month').subtract(0, 'month').toISOString();
-    const endDate = moment().endOf('month').subtract(0, 'month').toISOString();
+  options(props) {
     const auth0UserId = getProfile().user_id;
     return {
       variables: {
-        startDate,
-        endDate,
         auth0UserId,
       },
     };
@@ -166,32 +126,9 @@ const CategoriesForBudget = graphql(qCategoriesForBudget, {
   props: ({ ownProps, data: { loading, allCategories, refetch } }) => ({
     ownProps,
     isLoading: loading,
-    categories: prepareFiancialAccounts(allCategories) || [],
+    categories: allCategories || [],
     refetch,
   }),
 })(CategoriesSection);
 
 export default CategoriesForBudget;
-
-function prepareFiancialAccounts(financialAccounts) {
-  return !financialAccounts || financialAccounts.length < 1 ? null :
-    financialAccounts.reduce((fas, fa) => ([...fas, {
-      ...fa,
-      currentBalance: fa.openingBalance ?
-        fa.openingBalance + getCurrentBalance(fa) :
-        getCurrentBalance(fa),
-    }]), []);
-}
-
-function getCurrentBalance(financialAccount) {
-  if (financialAccount.type === 'debt') {
-    return financialAccount.negativeTransactions
-             .reduce((total, t) => total + t.amount, 0) -
-           financialAccount.positiveTransactions
-             .reduce((total, t) => total + t.amount, 0);
-  }
-  return financialAccount.positiveTransactions
-           .reduce((total, t) => total + t.amount, 0) -
-         financialAccount.negativeTransactions
-           .reduce((total, t) => total + t.amount, 0);
-}
