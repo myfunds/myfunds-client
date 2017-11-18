@@ -42,15 +42,35 @@ class CategoriesOverview extends Component {
       category.max - category.currentBalance
     );
     return (
-      <Tile>
-        <h4>{category.name}</h4>
-        <h4>{difference}</h4>
-        <progress
-          className={`progress progress-${color}`}
-          value={percent > 100 ? 100 : percent}
-          max="100"
-        />
-      </Tile>
+      <div>
+        <Tile>
+          <h4>{category.name}</h4>
+          <h4>{difference}</h4>
+          <progress
+            className={`progress progress-${color}`}
+            value={percent > 100 ? 100 : percent}
+            max="100"
+          />
+        </Tile>
+        <h2>REFUNDS</h2>
+        {category.negativeTransactions && category.negativeTransactions.map(transaction => (
+          <Tile>
+            <div style={{display:'flex', justifyContent:'space-between'}}>
+              <div>{transaction.description}</div>
+              <div>{transaction.amount}</div>
+            </div>
+          </Tile>
+        ))}
+        <h2>SPENDING</h2>
+        {category.positiveTransactions && category.positiveTransactions.map(transaction => (
+          <Tile>
+            <div style={{display:'flex', justifyContent:'space-between'}}>
+              <div>{transaction.description}</div>
+              <div>{transaction.amount}</div>
+            </div>
+          </Tile>
+        ))}
+      </div>
     );
 
   }
@@ -89,6 +109,7 @@ query qDashboard(
       id
       amount
       transactionDate
+      description
     }
     negativeTransactions(
       filter:{
@@ -99,6 +120,7 @@ query qDashboard(
       id
       amount
       transactionDate
+      description
     }
   }
 }
