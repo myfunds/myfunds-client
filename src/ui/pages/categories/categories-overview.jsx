@@ -71,7 +71,7 @@ class CategoriesOverview extends Component {
           </Tile>
         ))}
       </div>
-    );
+   );
 
   }
 }

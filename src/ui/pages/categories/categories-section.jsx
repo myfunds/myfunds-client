@@ -37,22 +37,19 @@ class CategoriesSection extends Component {
     this.setState(() => ({ categoryId: target.value }));
   }
   setRangeLastMonth() {
-    console.log('THIS MONTH');
-    this.setState(() => ({
+   this.setState(() => ({
       startDate: moment().startOf('month').subtract(1, 'month').toISOString(),
       endDate: moment().endOf('month').subtract(1, 'month').toISOString(),
     }));
   }
   setRangeThisMonth() {
-    console.log('THIS MONTH');
-    this.setState(() => ({
+   this.setState(() => ({
       startDate: moment().startOf('month').subtract(0, 'month').toISOString(),
       endDate: moment().endOf('month').subtract(0, 'month').toISOString(),
     }));
   }
   setRangePreviousMonth() {
-    console.log('PREVIOUS MONTH');
-    this.setState(() => ({
+   this.setState(() => ({
       startDate: moment(this.state.startDate).startOf('month').subtract(1, 'month').toISOString(),
       endDate: moment(this.state.endDate).endOf('month').subtract(1, 'month').toISOString(),
     }));
